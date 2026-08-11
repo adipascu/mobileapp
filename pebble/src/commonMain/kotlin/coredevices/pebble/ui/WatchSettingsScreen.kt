@@ -1390,8 +1390,8 @@ fun rememberSettingsItemsState(navBarNav: NavBarNav?, snackbarDisplay: SnackbarD
                     },
                 ),
                 basicSettingsToggleItem(
-                    title = "Show debug options",
-                    description = "Show some extra debug options around the app - not useful for most users (contains some options which might break your watch)",
+                    title = "Developer mode",
+                    description = "Reveals Debug tools on each watch and other developer features, and lets adb sideload firmware without asking you first. Not meant for everyday use, and some tools can break your watch.",
                     topLevelType = TopLevelType.Phone,
                     section = Section.Debug,
                     checked = debugOptionsEnabled,

@@ -1394,7 +1394,7 @@ fun WatchMenu(watch: PebbleDevice, navBarNav: NavBarNav) {
                 val active by watch.devConnectionActive.collectAsState()
                 val canUseDevConnection = user?.isAnonymousUser == false || config.watchConfig.lanDevConnection
                 DropdownMenuItem(
-                    text = { Text("Dev Connection") },
+                    text = { Text("SDK connection") },
                     leadingIcon = { Icon(Icons.Outlined.DeveloperBoard, contentDescription = null) },
                     trailingIcon = { Switch(
                         checked = active,
@@ -1460,7 +1460,7 @@ fun WatchMenu(watch: PebbleDevice, navBarNav: NavBarNav) {
             if (showDebugOptions && watch is CommonConnectedDevice) {
                 Box {
                     DropdownMenuItem(
-                        text = { Text("Debug") },
+                        text = { Text("Debug tools") },
                         leadingIcon = { Icon(Icons.Default.Terminal, null) },
                         trailingIcon = { Icon(Icons.Default.ChevronRight, null) },
                         onClick = { debugMenuExpanded = true }
