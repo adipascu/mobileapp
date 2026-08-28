@@ -45,7 +45,7 @@ android {
     namespace = "coredevices.coreapp"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
-    if (!localReleaseBuild) {
+    if (!fdroidBuild && !localReleaseBuild) {
         signingConfigs {
             create("release") {
                 storeFile = file("../keystore.jks")
@@ -63,7 +63,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
             //noinspection ChromeOsAbiSupport
-            abiFilters += setOf("armeabi-v7a", "arm64-v8a")
+            abiFilters += if (fdroidBuild) {
+                setOf("armeabi-v7a", "arm64-v8a", "x86_64")
+            } else {
+                setOf("armeabi-v7a", "arm64-v8a")
+            }
         }
     }
     packaging {
@@ -75,16 +79,20 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            if (localReleaseBuild) {
-                signingConfig = signingConfigs.getByName("debug")
-                // Crashlytics regenerates a mapping-id resource every build
-                // (upToDateWhen=false), forcing aapt + a full R8 rerun even on
-                // null builds. Skip it for local release builds.
-                configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
-                    mappingFileUploadEnabled = false
+            if (!fdroidBuild) {
+                if (localReleaseBuild) {
+                    signingConfig = signingConfigs.getByName("debug")
+                    // Crashlytics regenerates a mapping-id resource every build
+                    // (upToDateWhen=false), forcing aapt + a full R8 rerun even on
+                    // null builds. Skip it for local release builds. Configured by
+                    // name because the Crashlytics plugin classes are not on the
+                    // F-Droid build's script classpath.
+                    extensions.getByName("firebaseCrashlytics").withGroovyBuilder {
+                        "setMappingFileUploadEnabled"(false)
+                    }
+                } else {
+                    signingConfig = signingConfigs.getByName("release")
                 }
-            } else {
-                signingConfig = signingConfigs.getByName("release")
             }
             isDebuggable = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -92,9 +100,17 @@ android {
         getByName("debug") {
             isMinifyEnabled = false
             isDebuggable = true
-            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
-                mappingFileUploadEnabled = false
+            if (!fdroidBuild) {
+                extensions.getByName("firebaseCrashlytics").withGroovyBuilder {
+                    "setMappingFileUploadEnabled"(false)
+                }
             }
+        }
+    }
+    sourceSets {
+        if (fdroidBuild) {
+            getByName("debug").manifest.srcFile("src/androidFdroid/AndroidManifest.xml")
+            getByName("release").manifest.srcFile("src/androidFdroid/AndroidManifest.xml")
         }
     }
     compileOptions {
