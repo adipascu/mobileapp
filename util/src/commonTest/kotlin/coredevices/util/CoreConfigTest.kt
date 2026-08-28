@@ -23,4 +23,10 @@ class CoreConfigTest {
         assertEquals(null, decoded.weatherUnits)
         assertEquals(deviceDefaultWeatherUnit(), decoded.resolvedWeatherUnits)
     }
+
+    @Test
+    fun weatherIsOptInForFdroidBuilds() {
+        assertEquals(!CommonBuildKonfig.FDROID_BUILD, CoreConfig().fetchWeather)
+        assertEquals(!CommonBuildKonfig.FDROID_BUILD, CoreConfig().interceptPKJSWeather)
+    }
 }
