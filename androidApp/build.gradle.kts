@@ -75,6 +75,9 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    if (fdroidBuild) {
+        androidResources.ignoreAssetsPatterns.add("needle-pebble-ft-cq4.zip")
+    }
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
